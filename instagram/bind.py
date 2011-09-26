@@ -90,7 +90,7 @@ def bind_method(**config):
             status_code = content_obj['meta']['code']
             if status_code == 200:
                 if not self.objectify_response:
-                    return content_obj, None
+                    return content_obj, None, None
 
                 if self.response_type == 'list':
                     for entry in content_obj['data']:
