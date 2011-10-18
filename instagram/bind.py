@@ -105,9 +105,9 @@ def bind_method(**config):
         def _paginator_with_url(self, url, method="GET", body=None, headers={}):
             pages_read = 0
             while url and pages_read < self.max_pages:
-                 response_objects, url = self._do_api_request(url, method, body, headers)
+                 response_objects, url, cursor = self._do_api_request(url, method, body, headers)
                  pages_read += 1
-                 yield response_objects, url 
+                 yield response_objects, url, cursor 
             return
 
         def execute(self):

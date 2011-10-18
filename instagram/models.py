@@ -50,6 +50,8 @@ class Media(ApiModel):
 
         new_media.link = entry['link']
 
+	new_media.tags = entry['tags']
+
         return new_media
 
 class Tag(ApiModel):
