@@ -86,21 +86,26 @@ def bind_method(**config):
             if response['status'] == '503':
                 raise InstagramAPIError(response['status'], "Rate limited", "Your client is making too many request per second")
             content_obj = simplejson.loads(content)
+	    if content_obj['code'] == '420':
+		raise InstagramAPIError(content_obj['code'], "OAuth Rate limited", "You have exceeded the maximum number of requests per hour")
             response_objects = []
-            status_code = content_obj['meta']['code']
-            if status_code == 200:
-                if not self.objectify_response:
-                    return content_obj, None, None
+	    if 'meta' in content_obj:
+            	status_code = content_obj['meta']['code']
+            	if status_code == 200:
+                    if not self.objectify_response:
+                    	return content_obj, None, None
 
-                if self.response_type == 'list':
-                    for entry in content_obj['data']:
-                        obj = self.root_class.object_from_dictionary(entry)
-                        response_objects.append(obj)
-                elif self.response_type == 'entry':
-                    response_objects = self.root_class.object_from_dictionary(content_obj['data'])
-                return response_objects, content_obj.get('pagination', {}).get('next_url'), content_obj.get('pagination', {}).get('next_cursor')
-            else:
-                raise InstagramAPIError(status_code, content_obj['meta']['error_type'], content_obj['meta']['error_message'])
+                    if self.response_type == 'list':
+                    	for entry in content_obj['data']:
+                            obj = self.root_class.object_from_dictionary(entry)
+                            response_objects.append(obj)
+                    elif self.response_type == 'entry':
+                    	response_objects = self.root_class.object_from_dictionary(content_obj['data'])
+                    return response_objects, content_obj.get('pagination', {}).get('next_url'), content_obj.get('pagination', {}).get('next_cursor')
+            	else:
+                    raise InstagramAPIError(status_code, content_obj['meta']['error_type'], content_obj['meta']['error_message'])
+	    else:
+		raise InstagramAPIError(response['status'], "Unknown error", "Please contact Instagram")
 
         def _paginator_with_url(self, url, method="GET", body=None, headers={}):
             pages_read = 0
